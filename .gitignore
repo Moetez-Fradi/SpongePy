@@ -1,0 +1,4 @@
+train.csv
+poetry.lock
+./spongepy/exemples
+./spongepy/__pycache__
