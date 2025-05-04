@@ -2,8 +2,11 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+./spongepy/exemples
+./spongepy/__pycache__
 /exemples
+./dist
+Sponged_data.csv
 
 # C extensions
 *.so

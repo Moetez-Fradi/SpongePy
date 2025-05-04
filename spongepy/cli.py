@@ -9,8 +9,10 @@ from .utils import read_into_df
 @click.option('--config', '-c', default=None, help='Input configuration file (JSON format)')
 @click.option('--stats', '-s', is_flag=True, help='Show general statistics')
 @click.option('--details', '-d', is_flag=True, help='Show detailed statistics')
+@click.option('--export', '-e', default=None, metavar='FILE', help='chose export name')
 
-def cli(file, clean, details, config, stats):
+
+def cli(file, clean, details, config, stats, export):
     """SpongePy - data processing tool"""
     print("\033[1;35m")
     print(r"""    
@@ -30,10 +32,10 @@ def cli(file, clean, details, config, stats):
     if clean:
         if config:
             click.echo(f"Cleaning data with config: {config}")
-            cl.configured_cleaning(df, config)
+            cl.configured_cleaning(df, config, file, export)
         else:
             click.echo("Cleaning data with default parameters")
-            cl.default_cleaning(df)
+            cl.default_cleaning(df, file, export)
 
     if details:
         click.echo("Showing detailed statistics:")

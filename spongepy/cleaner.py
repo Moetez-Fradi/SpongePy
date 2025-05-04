@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import re
 from .config_loader import use_config, create_config
-from .utils import primary_cleaning
+from .utils import primary_cleaning, write_from_df, clean_text_column, fix_id_column, construct_id_column, fix_phone_number, fix_name, fill_missing_data
 
 def show_general_stats(df, exp):
     def print_section(title, emoji="📊"):
@@ -107,7 +107,7 @@ def show_general_stats(df, exp):
         "potential-categorical" : potentialCategorical
     })
 
-def configured_cleaning(df, config):
+def configured_cleaning(df, config, file, export=None):
     print("importing configuration")
     cfg = use_config(config)
 
@@ -116,17 +116,25 @@ def configured_cleaning(df, config):
     for col, _, strategy in missing_data:
         if strategy == "None":
             continue
-        elif strategy == "mean":
-            mean_val = df[col].mean()
-            df[col].fillna(mean_val, inplace=True)
-        elif strategy == "medium":
-            median_val = df[col].median()
-            df[col].fillna(median_val, inplace=True)
+        if strategy in ("mean", "median"):
+            if not pd.api.types.is_numeric_dtype(df[col]):
+                print(f"  → skipping non-numeric column {col} for {strategy}")
+                continue
+            elif strategy == "mean":
+                print("appliying '" + strategy + "' to " + col)
+                mean_val = df[col].mean()
+                df[col] = df[col].fillna(mean_val)
+            elif strategy == "median":
+                print("appliying '" + strategy + "' to " + col)
+                median_val = df[col].median()
+                df[col] = df[col].fillna(median_val)
         elif strategy == "delete":
-            df.dropna(subset=[col], inplace=True)
+            print("dropping column " + col)
+            df.drop(col, axis=1, inplace=True)
 
     phone_number = cfg.get("phone-number")
     if phone_number:
+        print("fixing phone number")
         if isinstance(phone_number, str):
             fix_phone_number(df, phone_number)
         elif isinstance(phone_number, list):
@@ -135,6 +143,7 @@ def configured_cleaning(df, config):
 
     name = cfg.get("name")
     if name:
+        print("fixing name")
         if isinstance(name, str):
             fix_name(df, name)
         elif isinstance(name, list):
@@ -143,6 +152,7 @@ def configured_cleaning(df, config):
 
     broken_id = cfg.get("broken-id")
     if broken_id:
+        print("constructing id")
         if isinstance(broken_id, str):
             construct_id_column(df, broken_id)
         elif isinstance(broken_id, list):
@@ -151,14 +161,28 @@ def configured_cleaning(df, config):
 
     id = cfg.get("id")
     if id:
+        print("fixing id")
         if isinstance(id, str):
             fix_id_column(df, id)
         elif isinstance(id, list):
             for col in id:
                 fix_id_column(df, col)
 
+    for entry in cfg.get("text-columns", []):
+        col = entry["column"]
+        if col not in df.columns:
+            print(f"  → skipping text clean for dropped column {col}")
+            continue
+        clean_text_column(df, entry)
+    
+    write_from_df(df, file, export)
 
-def default_cleaning(df):
+    
+
+
+def default_cleaning(df, file, export):
     primary_cleaning(df)
     fill_missing_data(df)
     fix_id_column(df, "id")
+    write_from_df(df, file, export)
+
