@@ -1,17 +1,20 @@
 import click
 import pandas as pd
 from . import cleaner as cl
+from .utils import read_into_df
 
 @click.command()
 @click.option('--file', '-f', required=True, help='Input data file ')
-@click.option('--clean', is_flag=True, help='Clean the data')
-@click.option('--config', '-c', default=None, help='Configuration file (YAML format)')
+@click.option('--clean', is_flag=True, help='Clean the data based on a configuration file or predefined rules')
+@click.option('--config', '-c', default=None, help='Input configuration file (JSON format)')
 @click.option('--stats', '-s', is_flag=True, help='Show general statistics')
-def cli(file, clean, config, stats):
-    """SpongePy - Your data processing tool"""
+@click.option('--details', '-d', is_flag=True, help='Show detailed statistics')
+
+def cli(file, clean, details, config, stats):
+    """SpongePy - data processing tool"""
     print("\033[1;35m")
     print(r"""    
-        _____                             _____        
+       _____                              _____        
       / ____|                            |  __ \       
      | (___  _ __   ___  _ __   __ _  ___| |__) |   _  
       \___ \| '_ \ / _ \| '_ \ / _` |/ _ \  ___/ | | | 
@@ -22,17 +25,23 @@ def cli(file, clean, config, stats):
     """)
     print("\033[0m")
 
-    df = cl.read_into_df(file)
+    df = read_into_df(file)
 
     if clean:
         if config:
             click.echo(f"Cleaning data with config: {config}")
+            cl.configured_cleaning(df, config)
         else:
             click.echo("Cleaning data with default parameters")
+            cl.default_cleaning(df)
 
-    if stats:
+    if details:
+        click.echo("Showing detailed statistics:")
+        cl.show_general_stats(df, True)
+    elif stats:
         click.echo("Showing general statistics:")
-        cl.show_general_stats(df)
+        cl.show_general_stats(df, False)
+
     return df
 
 if __name__ == '__main__':

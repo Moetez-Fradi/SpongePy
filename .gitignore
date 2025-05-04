@@ -1,4 +1,42 @@
-train.csv
+# Byte‑compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+/exemples
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+eggs/
+*.egg-info/
+.installed.cfg
+*.egg
 poetry.lock
-./spongepy/exemples
-./spongepy/__pycache__
+
+# Virtual environments
+.env/
+.venv/
+venv/
+ENV/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# OS files
+.DS_Store
+Thumbs.db
+train.csv
+config.json
