@@ -1,6 +1,6 @@
 [project]
 name = "spongepy"
-version = "0.1.1"
+version = "0.1.2"
 description = "get your data cleaned in seconds!"
 authors = [
     {name = "GoldenDragon",email = "moetezfradi7@gmail.com"}
