@@ -1,6 +1,7 @@
 # SpongePy - Data Processing Toolkit 🧽
 
 A versatile Python CLI tool for cleaning, analyzing, and transforming structured data. Designed for data professionals who need quick data wrangling capabilities without spreadsheet software.
+Download here: https://pypi.org/project/spongepy/
  
        _____                              _____        
       / ____|                            |  __ \       
