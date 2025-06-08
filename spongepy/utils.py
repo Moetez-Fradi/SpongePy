@@ -121,30 +121,33 @@ def clean_text_column(df, entry):
       - "lowercase": string of allowed lowercase chars (e.g. "al")
       - "numbers":   string of allowed digits (e.g. "0123456789"), or "" to remove all digits
       - "special":   string of allowed special chars (e.g. " ()"), or "" to remove all special chars
+    This version removes only special characters not in the allowed set, preserving all letters, digits, and whitespace.
     """
     col = entry["column"]
     s = df[col].astype(str)
 
-    print("\ntreating " + col + " \n")
+    print(f"\nTreating column: {col}\n")
     special = entry.get("special", "")
+    allowed_chars = r"A-Za-z0-9\s"
     if special:
-        pattern = f"[^{re.escape(special)}]"
-        print("leaving only: " + pattern)
+        allowed_chars = allowed_chars + re.escape(special)
+        pattern = f"[^{allowed_chars}]"
+        print(f"Removing characters not in allowed set: letters, numbers, whitespace, or '{special}'")
         s = s.str.replace(pattern, "", regex=True)
     else:
-        print("removing special characters")
-        s = s.str.replace(r"[^A-Za-z0-9\s]+", "", regex=True)
+        print("Removing all special characters")
+        s = s.str.replace(r"[^A-Za-z0-9\s]", "", regex=True)
 
     numbers = entry.get("numbers", "")
     if not numbers:
-        print("removing numbers")
+        print("Removing digits as per config")
         s = s.str.replace(r"\d+", "", regex=True)
 
     if not entry.get("lowercase"):
-        print("converting to uppercase")
+        print("Converting all text to uppercase")
         s = s.str.upper()
     if not entry.get("uppercase"):
-        print("converting to lowercase")
+        print("Converting all text to lowercase")
         s = s.str.lower()
 
     df[col] = s
